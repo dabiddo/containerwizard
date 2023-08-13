@@ -27,7 +27,18 @@ if [[ "$CHOICE" == "Dockerfile" ]]; then
     echo "What $(gum style --italic --foreground 12 "Programing Language") ?"
     LCHOICE=$(gum choose --item.foreground 250 "PHP8.1" "NodeJs")
     if [[ "$LCHOICE" == "PHP8.1" ]]; then
-    paste ".stubs/PHP81.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
+    echo "What $(gum style --italic --foreground 12 "Base") ?"
+    PHPCHOICE=$(gum choose --item.foreground 250 "alpine" "debian")
+
+    case PHPCHOICE in
+    "debian")
+    paste ".stubs/php/php81_debian.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
+    ;;
+    *)
+    paste ".stubs/php/php81_alpine.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
+    ;;
+    esac
+    
     echo "Done!"
     elif [[ "$LCHOICE" == "NodeJs" ]]; then
     paste ".stubs/Node.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
