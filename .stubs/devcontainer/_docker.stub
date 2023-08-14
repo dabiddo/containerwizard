@@ -1,5 +1,5 @@
 {
-    "name":"{$DIR}",
+    "name":"$DIR",
     "build": { "dockerfile": "Dockerfile" },
 	"forwardPorts": [
 		3000
