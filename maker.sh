@@ -11,7 +11,7 @@ if [[ ! -e $DIR ]]; then
 elif [[ ! -d $DIR ]]; then
     echo "$DIR already exists but is not a directory" 1>&2
 fi
-
+export DIR
 echo -e "Working on it..."
 sleep 1; clear
 

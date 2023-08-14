@@ -1,5 +1,5 @@
 {
-    "name": $DIR,
+    "name": "$DIR",
     "service": "workspace",
     "workspaceFolder": "/app",
     "dockerComposeFile": [
