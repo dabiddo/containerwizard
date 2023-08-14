@@ -50,11 +50,18 @@ elif [[ "$CHOICE" == "Docker-Compose" ]]; then
 elif [[ "$CHOICE" == "Devcontainer" ]]; then
     echo "So Devcontiner it is"
     mkdir "$DIR/.devcontainer"
-    touch "$DIR/.devcontainer/Dockerfile"
-    touch "$DIR/.devcontainer/docker-compose.yaml"
-    touch "$DIR/.devcontainer/devcontainer.json"
+    CONTAINERCHOICE=$(gum choose "compose" "standalone")
+    if [[ "$CONTAINERCHOICE" == "compose" ]]; then
+        touch "$DIR/.devcontainer/docker-compose.yaml"
+        touch "$DIR/.devcontainer/devcontainer.json"
+        envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
+
+    elif [[ "$CONTAINERCHOICE" == "standalone" ]]; then
+        touch "$DIR/.devcontainer/Dockerfile"
+        paste ".stubs/devcontainer/_docker.stub" "$DIR/.devcontainer/devcontainer.json"
+    fi
 fi
 
-sleep 1; clear;
+#sleep 1; clear;
 
 echo "Done!"
