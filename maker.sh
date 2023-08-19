@@ -20,9 +20,75 @@ docker_language () {
     
     echo "Done!"
     elif [[ "$LCHOICE" == "NodeJs" ]]; then
-    paste ".stubs/Node.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
+    paste ".stubs/node/node18.stub" "$1/Dockerfile" >"$1/Dockerfile"
     echo "Done!"
     fi
+}
+
+compose_file(){
+    envsubst < ".stubs/compose/_base.stub" > "$1/.devcontainer/docker-compose.yaml"
+}
+
+compose_services() {
+    echo "What $(gum style --italic --foreground 12 "Services") do you want to add ?"
+    SERVICECHOICE=$(gum choose --no-limit --item.foreground 250 "Mysql" "Redis")
+    array=($SERVICECHOICE)
+    for element in "${array[@]}"; do
+        echo $element
+        case $element in
+        "Mysql")
+            COMPOSESERVICES+="mysql:\n"
+            COMPOSESERVICES+="\timage: mysql:5.7\n"
+            COMPOSESERVICES+="\tports:\n"
+            COMPOSESERVICES+="\t- '3306:3306'\n"
+            COMPOSESERVICES+="\tenvironment:\n"
+            COMPOSESERVICES+="\t- MYSQL_ROOT_PASSWORD=secret\n"
+            COMPOSESERVICES+="\t- MYSQL_DATABASE=laraveldb\n"
+            COMPOSESERVICES+="\tvolumes:\n"
+            COMPOSESERVICES+="\t- db-data:/var/lib/mysql:cached\n\n"
+            ;;
+        "Redis")
+            COMPOSESERVICES+="redis:\n"
+            COMPOSESERVICES+="\timage: redis:alpine\n"
+            COMPOSESERVICES+="\tports:\n"
+            COMPOSESERVICES+="\t- '6379:6379'\n\n"
+            ;;
+        esac
+    done
+    echo "$COMPOSESERVICES"
+}
+
+compose_services() {
+    echo "What $(gum style --italic --foreground 12 "Services") do you want to add ?"
+    SERVICECHOICE=$(gum choose --no-limit --item.foreground 250 "Mysql" "Redis")
+    array=($SERVICECHOICE)
+    for element in "${array[@]}"; do
+        echo $element
+        case $element in
+        "Mysql")
+            COMPOSESERVICES+="  mysql:
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=laraveldb
+    volumes:
+      - db-data:/var/lib/mysql:cached
+
+"
+            COMPOSEVOLUMES+="db-data:"
+            ;;
+        "Redis")
+            COMPOSESERVICES+="  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+
+"
+            ;;
+        esac
+    done
 }
 
 
@@ -71,6 +137,13 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
         envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
         #GET THE DOCKERFILE LANGUAGE
         docker_language "$DIR/.devcontainer"
+
+        compose_services
+        export COMPOSESERVICES
+        export COMPOSEVOLUMES
+        compose_file "$DIR"
+
+        
 
     elif [[ "$CONTAINERCHOICE" == "standalone" ]]; then
         touch "$DIR/.devcontainer/Dockerfile" #for now empty: wip

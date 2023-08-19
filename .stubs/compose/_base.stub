@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  workspace:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: $DIR-app #name of the image
+    depends_on:
+      - service #replace or delete if needed
+    volumes:
+      - ../:/app:cached
+
+$COMPOSESERVICES
+
+volumes:
+  $COMPOSEVOLUMES
