@@ -1,5 +1,31 @@
 #!/bin/bash
 
+
+########Functions#####
+docker_language () {
+   echo "What $(gum style --italic --foreground 12 "Programing Language") ?"
+    LCHOICE=$(gum choose --item.foreground 250 "PHP8.1" "NodeJs")
+    if [[ "$LCHOICE" == "PHP8.1" ]]; then
+    echo "What $(gum style --italic --foreground 12 "Base") ?"
+    PHPCHOICE=$(gum choose --item.foreground 250 "alpine" "debian")
+
+    case PHPCHOICE in
+    "debian")
+    paste ".stubs/php/php81_debian.stub" "$1/Dockerfile" >"$1/Dockerfile"
+    ;;
+    *)
+    paste ".stubs/php/php81_alpine.stub" "$1/Dockerfile" >"$1/Dockerfile"
+    ;;
+    esac
+    
+    echo "Done!"
+    elif [[ "$LCHOICE" == "NodeJs" ]]; then
+    paste ".stubs/Node.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
+    echo "Done!"
+    fi
+}
+
+
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
 # Ask the user directory name
 DIR=$(gum input --placeholder "What will be the name of the project?")
@@ -26,26 +52,8 @@ if [[ "$CHOICE" == "Dockerfile" ]]; then
     echo "So Dockferfile it is"
     touch "$DIR/Dockerfile"
     sleep 1; clear
-    echo "What $(gum style --italic --foreground 12 "Programing Language") ?"
-    LCHOICE=$(gum choose --item.foreground 250 "PHP8.1" "NodeJs")
-    if [[ "$LCHOICE" == "PHP8.1" ]]; then
-    echo "What $(gum style --italic --foreground 12 "Base") ?"
-    PHPCHOICE=$(gum choose --item.foreground 250 "alpine" "debian")
-
-    case PHPCHOICE in
-    "debian")
-    paste ".stubs/php/php81_debian.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
-    ;;
-    *)
-    paste ".stubs/php/php81_alpine.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
-    ;;
-    esac
-    
-    echo "Done!"
-    elif [[ "$LCHOICE" == "NodeJs" ]]; then
-    paste ".stubs/Node.stub" "$DIR/Dockerfile" >"$DIR/Dockerfile"
-    echo "Done!"
-    fi
+    docker_language "$DIR"
+   
 #If user chooses a docker-compose: create docker-compose.yaml file, and ask for services to include
 elif [[ "$CHOICE" == "Docker-Compose" ]]; then
     echo "So Docker Compose it is"
@@ -57,9 +65,12 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
     mkdir "$DIR/.devcontainer"
     CONTAINERCHOICE=$(gum choose "compose" "standalone")
     if [[ "$CONTAINERCHOICE" == "compose" ]]; then
+        touch "$DIR/.devcontainer/Dockerfile" #for now empty: wip
         touch "$DIR/.devcontainer/docker-compose.yaml" #for now empty: wip
         touch "$DIR/.devcontainer/devcontainer.json"
         envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
+        #GET THE DOCKERFILE LANGUAGE
+        docker_language "$DIR/.devcontainer"
 
     elif [[ "$CONTAINERCHOICE" == "standalone" ]]; then
         touch "$DIR/.devcontainer/Dockerfile" #for now empty: wip
