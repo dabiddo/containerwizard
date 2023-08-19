@@ -78,7 +78,7 @@ compose_services() {
 
 "
             COMPOSEVOLUMES+="db-data:"
-            ;;
+        ;;
         "Redis")
             COMPOSESERVICES+="  redis:
     image: redis:alpine
@@ -86,7 +86,7 @@ compose_services() {
       - '6379:6379'
 
 "
-            ;;
+        ;;
         esac
     done
     #Export variables to be available for merge
