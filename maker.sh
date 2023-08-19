@@ -89,6 +89,9 @@ compose_services() {
             ;;
         esac
     done
+    #Export variables to be available for merge
+    export COMPOSESERVICES
+    export COMPOSEVOLUMES
 }
 
 
@@ -139,8 +142,7 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
         docker_language "$DIR/.devcontainer"
 
         compose_services
-        export COMPOSESERVICES
-        export COMPOSEVOLUMES
+        
         compose_file "$DIR"
 
         
