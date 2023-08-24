@@ -125,6 +125,8 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
     elif [[ "$CONTAINERCHOICE" == "standalone" ]]; then
         touch "$DIR/.devcontainer/Dockerfile" #for now empty: wip
         envsubst < ".stubs/devcontainer/_docker.stub" > "$DIR/.devcontainer/devcontainer.json"
+         #GET THE DOCKERFILE LANGUAGE
+        docker_language "$DIR/.devcontainer"
     fi
 fi
 

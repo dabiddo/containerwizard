@@ -7,14 +7,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-azuretools.vscode-docker",
-				"Nuxtr.nuxtr-vscode",
-				"hollowtree.vue-pack",
-				"EditorConfig.EditorConfig",
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
-				"Vue.volar",
-				"MisterJ.vue-volar-extention-pack"
+			
 			]
 		}
 	}
