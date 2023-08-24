@@ -26,36 +26,7 @@ docker_language () {
 }
 
 compose_file(){
-    envsubst < ".stubs/compose/_base.stub" > "$1/.devcontainer/docker-compose.yaml"
-}
-
-compose_services() {
-    echo "What $(gum style --italic --foreground 12 "Services") do you want to add ?"
-    SERVICECHOICE=$(gum choose --no-limit --item.foreground 250 "Mysql" "Redis")
-    array=($SERVICECHOICE)
-    for element in "${array[@]}"; do
-        echo $element
-        case $element in
-        "Mysql")
-            COMPOSESERVICES+="mysql:\n"
-            COMPOSESERVICES+="\timage: mysql:5.7\n"
-            COMPOSESERVICES+="\tports:\n"
-            COMPOSESERVICES+="\t- '3306:3306'\n"
-            COMPOSESERVICES+="\tenvironment:\n"
-            COMPOSESERVICES+="\t- MYSQL_ROOT_PASSWORD=secret\n"
-            COMPOSESERVICES+="\t- MYSQL_DATABASE=laraveldb\n"
-            COMPOSESERVICES+="\tvolumes:\n"
-            COMPOSESERVICES+="\t- db-data:/var/lib/mysql:cached\n\n"
-            ;;
-        "Redis")
-            COMPOSESERVICES+="redis:\n"
-            COMPOSESERVICES+="\timage: redis:alpine\n"
-            COMPOSESERVICES+="\tports:\n"
-            COMPOSESERVICES+="\t- '6379:6379'\n\n"
-            ;;
-        esac
-    done
-    echo "$COMPOSESERVICES"
+    envsubst < ".stubs/compose/_base.stub" > "$1/.devcontainer/docker-compose.yml"
 }
 
 compose_services() {
@@ -98,7 +69,7 @@ compose_services() {
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
 # Ask the user directory name
 DIR=$(gum input --placeholder "What will be the name of the project?")
-
+#PLACEHOLDER="${\localWorkspaceFolderBasename}"
 #read dir
 if [[ ! -e $DIR ]]; then
     mkdir $DIR
@@ -107,6 +78,7 @@ elif [[ ! -d $DIR ]]; then
 fi
 #export variable for future variable substitution
 export DIR
+#export PLACEHOLDER
 echo -e "Working on it..."
 sleep 1; clear
 
@@ -123,10 +95,10 @@ if [[ "$CHOICE" == "Dockerfile" ]]; then
     sleep 1; clear
     docker_language "$DIR"
    
-#If user chooses a docker-compose: create docker-compose.yaml file, and ask for services to include
+#If user chooses a docker-compose: create docker-compose.yml file, and ask for services to include
 elif [[ "$CHOICE" == "Docker-Compose" ]]; then
     echo "So Docker Compose it is"
-    touch "$DIR/docker-compose.yaml" #WIP: ask for services to include in the yaml file
+    touch "$DIR/docker-compose.yml" #WIP: ask for services to include in the yml file
 #If user chooses to create a devcontainer project, create the hidden devcontainer directory, 
 # and ask what kind of project. [standalone, compose] to add the correct json config
 elif [[ "$CHOICE" == "Devcontainer" ]]; then
@@ -135,9 +107,12 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
     CONTAINERCHOICE=$(gum choose "compose" "standalone")
     if [[ "$CONTAINERCHOICE" == "compose" ]]; then
         touch "$DIR/.devcontainer/Dockerfile" #for now empty: wip
-        touch "$DIR/.devcontainer/docker-compose.yaml" #for now empty: wip
+        touch "$DIR/.devcontainer/docker-compose.yml" #for now empty: wip
         touch "$DIR/.devcontainer/devcontainer.json"
         envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
+        #envsubst '${localWorkspaceFolderBasename}' < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
+        # Replace the placeholder with the original variable in the generated JSON file
+        sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$DIR/.devcontainer/devcontainer.json"
         #GET THE DOCKERFILE LANGUAGE
         docker_language "$DIR/.devcontainer"
 
