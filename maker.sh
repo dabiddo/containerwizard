@@ -7,14 +7,14 @@ docker_language () {
     LCHOICE=$(gum choose --item.foreground 250 "PHP8.1" "NodeJs")
     if [[ "$LCHOICE" == "PHP8.1" ]]; then
     echo "What $(gum style --italic --foreground 12 "Base") ?"
-    PHPCHOICE=$(gum choose --item.foreground 250 "alpine" "debian")
+    PHPCHOICE=$(gum choose --item.foreground 250 "msft" "debian")
 
     case PHPCHOICE in
     "debian")
     paste ".stubs/php/php81_debian.stub" "$1/Dockerfile" >"$1/Dockerfile"
     ;;
     *)
-    paste ".stubs/php/php81_alpine.stub" "$1/Dockerfile" >"$1/Dockerfile"
+    paste ".stubs/php/php81_msft.stub" "$1/Dockerfile" >"$1/Dockerfile"
     ;;
     esac
     
