@@ -81,7 +81,7 @@ if [ -d "$gitDir" ]
 then
     # The /my-dir directory exists, so print a message
     echo "The .git directory exists, lets delete it.."
-    #rm -Rf $WORKING_DIR
+    #rm -Rf $gitDir
 else
     # The /my-dir directory does not exist, so print a message and create it
     echo "The .git directory does not exist. Creating it now..."
