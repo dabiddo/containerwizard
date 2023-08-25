@@ -73,6 +73,24 @@ compose_services() {
 
 
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
+
+
+# Check if the .git directory exists and delete it
+gitDir=".git"
+if [ -d "$gitDir" ]
+then
+    # The /my-dir directory exists, so print a message
+    echo "The .git directory exists, lets delete it.."
+    #rm -Rf $WORKING_DIR
+else
+    # The /my-dir directory does not exist, so print a message and create it
+    echo "The .git directory does not exist. Creating it now..."
+    
+fi
+
+
+sleep 3; clear
+
 # Ask the user directory name
 DIR=$(gum input --placeholder "What will be the name of the project?")
 #PLACEHOLDER="${\localWorkspaceFolderBasename}"
@@ -138,6 +156,6 @@ elif [[ "$CHOICE" == "Devcontainer" ]]; then
     fi
 fi
 
-#sleep 1; clear;
+sleep 1; clear;
 
-#echo "Done!"
+echo "Done!"
