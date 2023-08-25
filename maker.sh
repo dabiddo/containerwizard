@@ -84,7 +84,7 @@ then
     #rm -Rf $gitDir
 else
     # The /my-dir directory does not exist, so print a message and create it
-    echo "The .git directory does not exist. Creating it now..."
+    echo "The .git directory does not exist. Moving on..."
     
 fi
 
