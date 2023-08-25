@@ -36,36 +36,51 @@ compose_file(){
 }
 
 compose_services() {
-    echo "What $(gum style --italic --foreground 12 "Services") do you want to add ?"
-    SERVICECHOICE=$(gum choose --no-limit --item.foreground 250 "Mysql" "Redis")
-    array=($SERVICECHOICE)
-    for element in "${array[@]}"; do
-        echo $element
-        case $element in
-        "Mysql")
-            COMPOSESERVICES+="  mysql:
-    image: mysql:5.7
-    ports:
-      - '3306:3306'
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=laraveldb
-    volumes:
-      - db-data:/var/lib/mysql:cached
+
+     echo "Would you like to add more $(gum style --italic --foreground 12 "Services") ?"
+     MORE=$(gum choose --item.foreground 250 "no" "yes")
+     DEPENDSON=""
+    if [[ "$MORE" == "no" ]]; then
+        export DEPENDSON
+    elif [[ "$MORE" == "yes" ]]; then
+         DEPENDSON+="depends_on:"
+         echo "What $(gum style --italic --foreground 12 "Services") do you want to add ?"
+        SERVICECHOICE=$(gum choose --no-limit --item.foreground 250 "Mysql" "Redis")
+        array=($SERVICECHOICE)
+        for element in "${array[@]}"; do
+            echo $element
+            case $element in
+            "Mysql")
+                COMPOSESERVICES+="  mysql:
+        image: mysql:5.7
+        ports:
+        - '3306:3306'
+        environment:
+        - MYSQL_ROOT_PASSWORD=secret
+        - MYSQL_DATABASE=laraveldb
+        volumes:
+        - db-data:/var/lib/mysql:cached
+"
+                COMPOSEVOLUMES+="db-data:"
+                DEPENDSON+="
+        - mysql"
+            ;;
+            "Redis")
+                COMPOSESERVICES+="  redis:
+        image: redis:alpine
+        ports:
+        - '6379:6379'
 
 "
-            COMPOSEVOLUMES+="db-data:"
-        ;;
-        "Redis")
-            COMPOSESERVICES+="  redis:
-    image: redis:alpine
-    ports:
-      - '6379:6379'
+            DEPENDSON+="
+        - redis"
+            ;;
+            esac
+        done
+        export DEPENDSON
+    fi
 
-"
-        ;;
-        esac
-    done
+   
     #Export variables to be available for merge
     export COMPOSESERVICES
     export COMPOSEVOLUMES
@@ -93,7 +108,7 @@ sleep 3; clear
 
 # Ask the user directory name
 DIR=$(gum input --placeholder "What will be the name of the project?")
-#PLACEHOLDER="${\localWorkspaceFolderBasename}"
+
 #read dir
 if [[ ! -e $DIR ]]; then
     mkdir $DIR
