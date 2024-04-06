@@ -28,12 +28,17 @@ create_nestjs_project() {
     sudo rm -rf .pnpm-store 
 }
 
+# Function to create a new Refine.dev project using Docker
+create_refine_project() {
+    sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm init refine-app@latest && chown -R $(id -u):$(id -g) "
+}
+
 
 # Main Menu
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
 
 echo "What do you want to do?"
-CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Quit")
+CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Create a new Refine.dev project" "Quit")
 
 if [[ "$CHOICE" == "Create a new Laravel project" ]]; then
     sleep 1; clear
@@ -44,6 +49,9 @@ elif [[ "$CHOICE" == "Create a new Nuxt.Js project" ]]; then
 elif [[ "$CHOICE" == "Create a new NestJs project" ]]; then
     sleep 1; clear
     create_nestjs_project 
+elif [[ "$CHOICE" == "Create a new Refine.dev project" ]]; then
+    sleep 1; clear
+    create_refine_project 
 elif [[ "$CHOICE" == "Quit" ]]; then
     echo "Exiting..."; exit
 fi
