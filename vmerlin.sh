@@ -30,6 +30,9 @@ install_container() {
     echo "devcontainer.json created successfully inside '$devcontainer_dir'."
 }
 
+gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
+
+
 # Interactive menu
 PS3="Select an option: "
 options=("Create a new project" "Install container" "Quit")
