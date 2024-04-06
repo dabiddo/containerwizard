@@ -18,12 +18,22 @@ create_nuxt_project() {
     sudo rm -rf .pnpm-store 
 }
 
+# Function to create a new NestJs project using Docker
+create_nestjs_project() {
+    read -p "Enter project name: " project_name
+    sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g pnpm @nestjs/cli && nest new $project_name && chown -R $(id -u):$(id -g) $project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+    echo "cleaning temporary files..."
+    sudo rm -rf .pnpm-store 
+}
+
 
 # Main Menu
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DockerWizard')."
 
 echo "What do you want to do?"
-CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Quit")
+CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Quit")
 
 if [[ "$CHOICE" == "Create a new Laravel project" ]]; then
     sleep 1; clear
@@ -31,6 +41,9 @@ if [[ "$CHOICE" == "Create a new Laravel project" ]]; then
 elif [[ "$CHOICE" == "Create a new Nuxt.Js project" ]]; then
     sleep 1; clear
     create_nuxt_project 
+elif [[ "$CHOICE" == "Create a new NestJs project" ]]; then
+    sleep 1; clear
+    create_nestjs_project 
 elif [[ "$CHOICE" == "Quit" ]]; then
     echo "Exiting..."; exit
 fi
