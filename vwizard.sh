@@ -64,12 +64,18 @@ create_compose_dev_container(){
     envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
 
     unset DIR
-    
+
     sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$devcontainer_dir/devcontainer.json"
 
     # Create a default docker-compose.yml file
     touch "$devcontainer_dir/Dockerfile" #for now empty
     touch "$devcontainer_dir/docker-compose.yml"
+
+    compose_file "$devcontainer_dir"
+}
+
+compose_file(){
+    envsubst < ".stubs/compose/_base.stub" > "$1/docker-compose.yml"
 }
 
 
