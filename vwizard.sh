@@ -6,6 +6,7 @@ create_laravel_project() {
     docker run --rm -v "$(pwd)":/app composer create-project --prefer-dist laravel/laravel "$project_name"
     sudo chown -R "$USER":"$USER" "$project_name"
     echo "Ownership changed to $USER:$USER for '$project_name'."
+    create_compose_dev_container "$project_name"
 }
 
 # Function to create a new NuxtJs project using Docker
@@ -31,6 +32,38 @@ create_nestjs_project() {
 # Function to create a new Refine.dev project using Docker
 create_refine_project() {
     sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm init refine-app@latest && chown -R $(id -u):$(id -g) "
+}
+
+create_dev_container(){
+    local project_name=$1
+    # Create the .devcontainer folder inside the project directory
+    devcontainer_dir="$project_name/.devcontainer"
+    mkdir "$devcontainer_dir"
+    echo "Folder '.devcontainer' created inside '$project_name'."
+
+    # Create a default.json file inside the .devcontainer folder
+    touch "$devcontainer_dir/devcontainer.json"
+    echo "{\"key\": \"value\"}" > "$devcontainer_dir/devcontainer.json"
+    echo "devcontainer.json created successfully inside '$devcontainer_dir'."
+}
+
+create_compose_dev_container(){
+    local project_name=$1
+    # Create the .devcontainer folder inside the project directory
+    devcontainer_dir="$project_name/.devcontainer"
+    mkdir "$devcontainer_dir"
+    echo "Folder '.devcontainer' created inside '$project_name'."
+
+    # Create a default.json file inside the .devcontainer folder
+    touch "$devcontainer_dir/devcontainer.json"
+    echo "{\"key\": \"value\"}" > "$devcontainer_dir/devcontainer.json"
+    echo "devcontainer.json created successfully inside '$devcontainer_dir'."
+    envsubst < ".stubs/devcontainer/_compose.stub" > "$devcontainer_dir/devcontainer.json"
+    sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$devcontainer_dir/devcontainer.json"
+
+    # Create a default docker-compose.yml file
+    touch "$devcontainer_dir/.devcontainer/Dockerfile" #for now empty
+    touch "$devcontainer_dir/docker-compose.yml"
 }
 
 
