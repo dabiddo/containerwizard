@@ -54,15 +54,21 @@ create_compose_dev_container(){
     mkdir "$devcontainer_dir"
     echo "Folder '.devcontainer' created inside '$project_name'."
 
+    DIR=$project_name
+    export DIR
+
     # Create a default.json file inside the .devcontainer folder
     touch "$devcontainer_dir/devcontainer.json"
-    echo "{\"key\": \"value\"}" > "$devcontainer_dir/devcontainer.json"
     echo "devcontainer.json created successfully inside '$devcontainer_dir'."
-    envsubst < ".stubs/devcontainer/_compose.stub" > "$devcontainer_dir/devcontainer.json"
+    
+    envsubst < ".stubs/devcontainer/_compose.stub" > "$DIR/.devcontainer/devcontainer.json"
+
+    unset DIR
+    
     sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$devcontainer_dir/devcontainer.json"
 
     # Create a default docker-compose.yml file
-    touch "$devcontainer_dir/.devcontainer/Dockerfile" #for now empty
+    touch "$devcontainer_dir/Dockerfile" #for now empty
     touch "$devcontainer_dir/docker-compose.yml"
 }
 
