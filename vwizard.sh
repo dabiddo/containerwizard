@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Function to CD into the current folder
+access_path()
+{
+    # Get the current directory
+    current_path=$(pwd)
+
+    # Print the current directory
+    echo "Current directory: $current_path"
+
+    # Extract the last component of the current directory path (the directory name)
+    current_dir=$(basename "$current_path")
+
+    # Print the directory name
+    echo "Current directory name: $current_dir"
+}
+
 # Function to create a new Laravel project using Docker
 create_laravel_project() {
     read -p "Enter project name: " project_name
@@ -87,7 +103,7 @@ laravel_compose_file(){
     envsubst < ".stubs/compose/_laravel.stub" > "$1/docker-compose.yml"
 }
 
-
+access_path
 # Main Menu
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DevContainerWizard')."
 
