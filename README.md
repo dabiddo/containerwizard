@@ -21,7 +21,7 @@ Give execute permission to `vwizard`
 sudo chmod +x /usr/local/bin/vwizard
 ```
 
-That should do it, you can call it from anywhere by calling `vwizard`
+That should do it, you can call it from anywhere by calling `vwizard
 
 ## Prerequisites
 Have [Gum](https://github.com/charmbracelet/gum) installed
