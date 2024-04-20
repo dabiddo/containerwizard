@@ -1,10 +1,11 @@
 {
     "name": "$DIR",
     "service": "php",
-    "workspaceFolder": "/workspaces/LOCAL_WORKSPACE_FOLDER_BASENAME",
+    "workspaceFolder": "/app",
     "dockerComposeFile": [
         "docker-compose.yml"
     ],
+    "postCreateCommand": "nvm install --lts",
     "customizations": {
         "vscode": {
             "extensions": [

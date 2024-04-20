@@ -87,8 +87,8 @@ create_compose_dev_container(){
     envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
 
     
-
-    sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$devcontainer_dir/devcontainer.json"
+    #No longer needed because frankenPHP always looks for /app folder
+    #sed -i 's/LOCAL_WORKSPACE_FOLDER_BASENAME/${localWorkspaceFolderBasename}/g' "$devcontainer_dir/devcontainer.json"
 
     # Create a default docker-compose.yml file
     touch "$devcontainer_dir/Dockerfile" #for now empty
