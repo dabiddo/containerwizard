@@ -71,6 +71,12 @@ create_compose_dev_container(){
     mkdir "$devcontainer_dir"
     echo "Folder '.devcontainer' created inside '$project_name'."
 
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
     DIR=$project_name
     export DIR
 
@@ -78,7 +84,7 @@ create_compose_dev_container(){
     touch "$devcontainer_dir/devcontainer.json"
     echo "devcontainer.json created successfully inside '$devcontainer_dir'."
     
-    envsubst < ".stubs/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
 
     
 
@@ -88,19 +94,19 @@ create_compose_dev_container(){
     touch "$devcontainer_dir/Dockerfile" #for now empty
     touch "$devcontainer_dir/docker-compose.yml"
 
-    laravel_compose_file "$devcontainer_dir"
+    laravel_compose_file "$devcontainer_dir" "$STUBS_DIR"
 
     unset DIR
 }
 
 # Replace the docker-compose.yml file with a default
 compose_file(){
-    envsubst < ".stubs/compose/_base.stub" > "$1/docker-compose.yml"
+    envsubst < "$2/compose/_base.stub" > "$1/docker-compose.yml"
 }
 
 # Replace the docker-compose.yml file with the one for laravel
 laravel_compose_file(){
-    envsubst < ".stubs/compose/_laravel.stub" > "$1/docker-compose.yml"
+    envsubst < "$2/compose/_laravel.stub" > "$1/docker-compose.yml"
 }
 
 access_path
