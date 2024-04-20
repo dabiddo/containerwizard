@@ -1,0 +1,28 @@
+{
+    "name": "$DIR",
+    "service": "php",
+    "workspaceFolder": "/workspaces/LOCAL_WORKSPACE_FOLDER_BASENAME",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "DEVSENSE.phptools-vscode",
+                "onecentlin.laravel-blade",
+                "shufo.vscode-blade-formatter",
+                "open-southeners.laravel-pint",
+                "amiralizadeh9480.laravel-extra-intellisense",
+                "codingyu.laravel-goto-view",
+                "absszero.vscode-laravel-goto",
+                "formulahendry.auto-rename-tag",
+                "vincaslt.highlight-matching-tag",
+                "bradlc.vscode-tailwindcss",
+                "ryannaddy.laravel-artisan",
+                "onecentlin.laravel5-snippets",
+                "onecentlin.laravel-extension-pack"
+            ]
+        }
+    }
+}
