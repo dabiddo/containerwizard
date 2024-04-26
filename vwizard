@@ -46,6 +46,15 @@ create_nestjs_project() {
     sudo rm -rf .pnpm-store 
 }
 
+# Function to create a new Rust project using Rust's Cargo
+create_rust_project(){
+    read -p "Enter project name: " project_name
+    sudo docker run --rm -v "$(pwd):/app" -w /app -it rust:slim-bookworm sh -c "cargo new $project_name && chown -R $(id -u):$(id -g) $project_name"
+    docker pull rust:slim-bookworm
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."    
+}
+
 # Function to create a new Refine.dev project using Docker
 create_refine_project() {
     sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm init refine-app@latest && chown -R $(id -u):$(id -g) "
@@ -115,7 +124,7 @@ access_path
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DevContainerWizard')."
 
 echo "What do you want to do?"
-CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Create a new Refine.dev project" "Quit")
+CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Quit")
 
 if [[ "$CHOICE" == "Create a new Laravel project" ]]; then
     sleep 1; clear
@@ -128,7 +137,10 @@ elif [[ "$CHOICE" == "Create a new NestJs project" ]]; then
     create_nestjs_project 
 elif [[ "$CHOICE" == "Create a new Refine.dev project" ]]; then
     sleep 1; clear
-    create_refine_project 
+    create_refine_project
+elif [[ "$CHOICE" == "Create a new Rust project" ]]; then
+    sleep 1; clear
+    create_rust_project  
 elif [[ "$CHOICE" == "Quit" ]]; then
     echo "Exiting..."; exit
 fi

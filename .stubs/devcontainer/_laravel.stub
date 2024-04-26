@@ -5,7 +5,6 @@
     "dockerComposeFile": [
         "docker-compose.yml"
     ],
-    "postCreateCommand": "bash -c 'nvm install --lts'",
     "customizations": {
         "vscode": {
             "extensions": [
