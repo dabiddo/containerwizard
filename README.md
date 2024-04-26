@@ -18,7 +18,7 @@ sudo cp vwizard /usr/local/bin/
 Copy `.stub/` directory to same folder
 
 ```sh
-sudo cp -R .stub /usr/local/bin/
+sudo cp -R .stubs /usr/local/bin/
 ```
 
 Give execute permission to `vwizard` 
