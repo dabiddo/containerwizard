@@ -52,7 +52,20 @@ create_rust_project(){
     sudo docker run --rm -v "$(pwd):/app" -w /app -it rust:slim-bookworm sh -c "cargo new $project_name && chown -R $(id -u):$(id -g) $project_name"
     docker pull rust:slim-bookworm
     sudo chown -R "$USER":"$USER" "$project_name"
-    echo "Ownership changed to $USER:$USER for '$project_name'."    
+    echo "Ownership changed to $USER:$USER for '$project_name'." 
+    create_dev_container "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_rust.stub" > "$DIR/.devcontainer/devcontainer.json"
+    unset DIR
 }
 
 # Function to create a new Refine.dev project using Docker
@@ -69,7 +82,6 @@ create_dev_container(){
 
     # Create a default.json file inside the .devcontainer folder
     touch "$devcontainer_dir/devcontainer.json"
-    echo "{\"key\": \"value\"}" > "$devcontainer_dir/devcontainer.json"
     echo "devcontainer.json created successfully inside '$devcontainer_dir'."
 }
 
