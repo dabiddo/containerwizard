@@ -2,7 +2,6 @@
 
 # Function to create a new project
 create_blank_project() {
-
     folder_name=".devcontainer"
 
     # Check if the folder already exists
@@ -17,6 +16,8 @@ create_blank_project() {
         touch "$folder_name/devcontainer.json"
         echo "devcontainer.json created successfully."
     fi
+
+    exit
 }
 
 # Function to create a blank Dockerfile
@@ -53,35 +54,40 @@ create_blank_compose() {
 
 # Function to create a laravel project
 create_laravel_project() {
-    create_blank_project
-    create_blank_dockerfile
-    create_blank_compose
-
+    sleep 1; clear
      # Get the directory containing this script
     SCRIPT_DIR="$(dirname "$0")"
 
     # Assuming the stubs directory is located alongside the script
     STUBS_DIR="$SCRIPT_DIR/.stubs"
     
+    # Get the current directory
+    current_path=$(pwd)
 
-    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    # Print the current directory
+    echo "Current directory: $current_path"
+
+    # Extract the last component of the current directory path (the directory name)
+    current_dir=$(basename "$current_path")
+
+    # Print the directory name
+    echo "Current directory name: $current_dir"
+
+    create_blank_project
+    create_blank_dockerfile
+    create_blank_compose
+
+
+    DIR=$current_dir
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > ".devcontainer/devcontainer.json"
+    sed -i "s|\"\$DIR\"|\"$DIR\"|g" .devcontainer/devcontainer.json
+
     unset DIR
+    exit
 }
 
-# Get the current directory
-current_path=$(pwd)
-
-# Print the current directory
-echo "Current directory: $current_path"
-
-# Extract the last component of the current directory path (the directory name)
-current_dir=$(basename "$current_path")
-
-# Print the directory name
-echo "Current directory name: $current_dir"
-
-DIR=$project_name
-export DIR
 
 # Interactive menu
 PS3="Select an option: "
@@ -89,7 +95,7 @@ options=("Create a Blank Project" "Create Laravel Project" "Create NextJs Projec
 
 select opt in "${options[@]}"; do
     case $REPLY in
-        1) create_blank_project ;;
+        1) sleep 1; clear; create_blank_project ;;
         2) create_laravel_project ;;
         3) create_nextjs_container ;;
         4) echo "Exiting..."; exit ;;
