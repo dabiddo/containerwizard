@@ -24,6 +24,7 @@ create_laravel_project() {
     sudo chown -R "$USER":"$USER" "$project_name"
     echo "Ownership changed to $USER:$USER for '$project_name'."
     create_compose_dev_container "$project_name"
+    exit
 }
 
 # Function to create a new NuxtJs project using Docker
@@ -34,6 +35,23 @@ create_nuxt_project() {
     echo "Ownership changed to $USER:$USER for '$project_name'."
     echo "cleaning temporary files..."
     sudo rm -rf .pnpm-store 
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_nuxt.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_node.stub" > "$DIR/.devcontainer/Dockerfile"
+    unset DIR
+
+    exit
 }
 
 # Function to create a new NestJs project using Docker
@@ -66,6 +84,7 @@ create_rust_project(){
 
     envsubst < "$STUBS_DIR/devcontainer/_rust.stub" > "$DIR/.devcontainer/devcontainer.json"
     unset DIR
+    exit
 }
 
 # Function to create a new Refine.dev project using Docker
@@ -83,6 +102,16 @@ create_dev_container(){
     # Create a default.json file inside the .devcontainer folder
     touch "$devcontainer_dir/devcontainer.json"
     echo "devcontainer.json created successfully inside '$devcontainer_dir'."
+}
+
+create_dockerfile()
+{
+    local project_name=$1
+    devcontainer_dir="$project_name/.devcontainer"
+
+    # Create a Dockerfile inside the .devcontainer folder
+    touch "$devcontainer_dir/Dockerfile"
+    echo "Dockerfile created successfully inside '$devcontainer_dir'."
 }
 
 create_compose_dev_container(){
@@ -133,26 +162,18 @@ laravel_compose_file(){
 
 access_path
 # Main Menu
-gum style --border normal --margin "1" --padding "1 2" --border-foreground 12 "Hello, there! Welcome to $(gum style --foreground 12 'DevContainerWizard')."
+# Interactive menu
+PS3="Select an option: "
+options=("Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Quit")
 
-echo "What do you want to do?"
-CHOICE=$(gum choose --item.foreground 250 "Create a new Laravel project" "Create a new Nuxt.Js project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Quit")
-
-if [[ "$CHOICE" == "Create a new Laravel project" ]]; then
-    sleep 1; clear
-    create_laravel_project 
-elif [[ "$CHOICE" == "Create a new Nuxt.Js project" ]]; then
-    sleep 1; clear
-    create_nuxt_project 
-elif [[ "$CHOICE" == "Create a new NestJs project" ]]; then
-    sleep 1; clear
-    create_nestjs_project 
-elif [[ "$CHOICE" == "Create a new Refine.dev project" ]]; then
-    sleep 1; clear
-    create_refine_project
-elif [[ "$CHOICE" == "Create a new Rust project" ]]; then
-    sleep 1; clear
-    create_rust_project  
-elif [[ "$CHOICE" == "Quit" ]]; then
-    echo "Exiting..."; exit
-fi
+select opt in "${options[@]}"; do
+    case $REPLY in
+        1) sleep 1; clear; create_laravel_project ;;
+        2) create_nuxt_project ;;
+        3) create_nestjs_project ;;
+        4) create_refine_project;;
+        5) create_rust_project;;
+        6) echo "Exiting..."; exit ;;
+        *) echo "Invalid option. Please select again." ;;
+    esac
+done
