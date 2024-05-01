@@ -63,6 +63,24 @@ create_nestjs_project() {
     echo "Ownership changed to $USER:$USER for '$project_name'."
     echo "cleaning temporary files..."
     sudo rm -rf .pnpm-store 
+
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_node.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_node.stub" > "$DIR/.devcontainer/Dockerfile"
+    unset DIR
+
+    exit
 }
 
 # Function to create a new Rust project using Rust's Cargo
@@ -170,10 +188,10 @@ options=("Create a new Laravel project" "Create a new Nuxt.Js project" "Create a
 select opt in "${options[@]}"; do
     case $REPLY in
         1) sleep 1; clear; create_laravel_project ;;
-        2) create_nuxt_project ;;
-        3) create_nestjs_project ;;
-        4) create_refine_project;;
-        5) create_rust_project;;
+        2) sleep 1; clear; create_nuxt_project ;;
+        3) sleep 1; clear; create_nestjs_project ;;
+        4) sleep 1; clear; create_refine_project;;
+        5) sleep 1; clear; create_rust_project;;
         6) echo "Exiting..."; exit ;;
         *) echo "Invalid option. Please select again." ;;
     esac
