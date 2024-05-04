@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#checks the project name does not contain spaces and or special characters
+validate_project_name() {
+    local project_name="$1"
+    local pattern="^[a-zA-Z0-9_-]+$"
+
+    if [[ $project_name =~ $pattern ]]; then
+        return 0 # Valid project name
+    else
+        return 1 # Invalid project name
+    fi
+}
+
 # Function to CD into the current folder
 access_path()
 {
@@ -30,28 +42,38 @@ create_laravel_project() {
 # Function to create a new NuxtJs project using Docker
 create_nuxt_project() {
     read -p "Enter project name: " project_name
-    docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g pnpm && pnpm dlx nuxt@latest init $project_name && chown -R $(id -u):$(id -g) $project_name"
-    sudo chown -R "$USER":"$USER" "$project_name"
-    echo "Ownership changed to $USER:$USER for '$project_name'."
-    echo "cleaning temporary files..."
-    sudo rm -rf .pnpm-store 
-    create_dev_container "$project_name"
-    create_dockerfile "$project_name"
 
-    # Get the directory containing this script
-    SCRIPT_DIR="$(dirname "$0")"
+    validate_project_name "$project_name"
 
-    # Assuming the stubs directory is located alongside the script
-    STUBS_DIR="$SCRIPT_DIR/.stubs"
+    if validate_project_name "$project_name"; then
+        docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g pnpm && pnpm dlx nuxt@latest init $project_name && chown -R $(id -u):$(id -g) $project_name"
+        sudo chown -R "$USER":"$USER" "$project_name"
+        echo "Ownership changed to $USER:$USER for '$project_name'."
+        echo "cleaning temporary files..."
+        sudo rm -rf .pnpm-store 
+        create_dev_container "$project_name"
+        create_dockerfile "$project_name"
 
-    DIR=$project_name
-    export DIR
+        # Get the directory containing this script
+        SCRIPT_DIR="$(dirname "$0")"
 
-    envsubst < "$STUBS_DIR/devcontainer/_nuxt.stub" > "$DIR/.devcontainer/devcontainer.json"
-    envsubst < "$STUBS_DIR/dockerfile/_node.stub" > "$DIR/.devcontainer/Dockerfile"
-    unset DIR
+        # Assuming the stubs directory is located alongside the script
+        STUBS_DIR="$SCRIPT_DIR/.stubs"
 
-    exit
+        DIR=$project_name
+        export DIR
+
+        envsubst < "$STUBS_DIR/devcontainer/_nuxt.stub" > "$DIR/.devcontainer/devcontainer.json"
+        envsubst < "$STUBS_DIR/dockerfile/_node.stub" > "$DIR/.devcontainer/Dockerfile"
+        unset DIR
+
+        exit
+    else
+        echo "Invalid project name. Please use only alphanumeric characters, hyphens, and underscores."
+        exit
+    fi
+
+    
 }
 
 # Function to create a new NestJs project using Docker
@@ -136,7 +158,16 @@ create_astrojs_project(){
 
 # Function to create a new Refine.dev project using Docker
 create_refine_project() {
-    sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm init refine-app@latest && chown -R $(id -u):$(id -g) "
+    read -p "Enter project name: " project_name
+
+    validate_project_name "$project_name"
+    if validate_project_name "$project_name"; then
+        sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g create-refine-app && npm create refine-app@latest $project_name && chown -R $(id -u):$(id -g) "
+        exit
+    else
+        echo "Invalid project name. Please use only alphanumeric characters, hyphens, and underscores."
+        exit
+    fi
 }
 
 create_dev_container(){
