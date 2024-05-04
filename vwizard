@@ -162,7 +162,25 @@ create_refine_project() {
 
     validate_project_name "$project_name"
     if validate_project_name "$project_name"; then
-        sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g create-refine-app && npm create refine-app@latest $project_name && chown -R $(id -u):$(id -g) "
+        sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install create-refine-app && npm create refine-app@latest $project_name && chown -R $(id -u):$(id -g) "
+        sudo chown -R "$USER":"$USER" "$project_name"
+        echo "Ownership changed to $USER:$USER for '$project_name'."
+        create_dev_container "$project_name"
+        create_dockerfile "$project_name"
+
+        # Get the directory containing this script
+        SCRIPT_DIR="$(dirname "$0")"
+
+        # Assuming the stubs directory is located alongside the script
+        STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+        DIR=$project_name
+        export DIR
+
+        envsubst < "$STUBS_DIR/devcontainer/_node.stub" > "$DIR/.devcontainer/devcontainer.json"
+        envsubst < "$STUBS_DIR/dockerfile/_node18.stub" > "$DIR/.devcontainer/Dockerfile"
+        unset DIR
+
         exit
     else
         echo "Invalid project name. Please use only alphanumeric characters, hyphens, and underscores."
