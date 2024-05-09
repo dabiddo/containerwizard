@@ -66,6 +66,8 @@ create_laravel_mysql_project() {
     envsubst < "$STUBS_DIR/compose/_laravel_mysql8.stub" > "$DIR/.devcontainer/docker-compose.yml"
     unset DIR
 
+    change_envfile "$project_name/.env" "mysql" "mysql" "$project_name"
+
     exit
 }
 
@@ -294,6 +296,31 @@ compose_file(){
 laravel_compose_file(){
     envsubst < "$2/dockerfile/_laravel.stub" > "$1/Dockerfile"
     envsubst < "$2/compose/_laravel.stub" > "$1/docker-compose.yml"
+}
+
+# Function to change values in .env file
+change_envfile() {
+    local env_file="$1"
+    local new_db_connection="$2"
+    local new_db_host="$3"
+    local $projectname = "$4"
+
+    if [ -f "$env_file" ]; then
+        # Set default values for Mysql
+        sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=$new_db_connection/" "$env_file"
+        sed -i "s/^# *DB_HOST=.*/DB_HOST=$new_db_host/" "$env_file"
+        sed -i "s/^# *DB_PORT=.*/DB_PORT=3306/" "$env_file"
+        sed -i "s/^# *DB_DATABASE=.*/DB_DATABASE=$projectname/" "$env_file"
+        sed -i "s/^# *DB_USERNAME=.*/DB_USERNAME=myuser/" "$env_file"
+        sed -i "s/^# *DB_PASSWORD=.*/DB_PASSWORD=password/" "$env_file"
+        
+        # Replace DB_HOST value
+        sed -i "s/DB_HOST=.*/DB_HOST=$new_db_host/" "$env_file"
+
+        echo "DB_CONNECTION set to $new_db_connection and DB_HOST set to $new_db_host in $env_file"
+    else
+        echo "$env_file not found."
+    fi
 }
 
 access_path
