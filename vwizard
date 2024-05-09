@@ -311,11 +311,8 @@ change_envfile() {
         sed -i "s/^# *DB_HOST=.*/DB_HOST=$new_db_host/" "$env_file"
         sed -i "s/^# *DB_PORT=.*/DB_PORT=3306/" "$env_file"
         sed -i "s/^# *DB_DATABASE=.*/DB_DATABASE=$projectname/" "$env_file"
-        sed -i "s/^# *DB_USERNAME=.*/DB_USERNAME=myuser/" "$env_file"
-        sed -i "s/^# *DB_PASSWORD=.*/DB_PASSWORD=password/" "$env_file"
-        
-        # Replace DB_HOST value
-        sed -i "s/DB_HOST=.*/DB_HOST=$new_db_host/" "$env_file"
+        sed -i "s/^# *DB_USERNAME=.*/DB_USERNAME=dbuser/" "$env_file"
+        sed -i "s/^# *DB_PASSWORD=.*/DB_PASSWORD=dbpassword/" "$env_file"
 
         echo "DB_CONNECTION set to $new_db_connection and DB_HOST set to $new_db_host in $env_file"
     else
