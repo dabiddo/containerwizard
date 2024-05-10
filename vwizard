@@ -36,6 +36,7 @@ create_laravel_project() {
     sudo chown -R "$USER":"$USER" "$project_name"
     echo "Ownership changed to $USER:$USER for '$project_name'."
     create_compose_dev_container "$project_name"
+    change_mailhog_env "$project_name/.env"
     exit
 }
 
@@ -67,6 +68,7 @@ create_laravel_mysql_project() {
     unset DIR
 
     change_envfile "$project_name/.env" "mysql" "mysql" "$project_name"
+    change_mailhog_env "$project_name/.env"
 
     exit
 }
@@ -315,6 +317,21 @@ change_envfile() {
         sed -i "s/^# *DB_PASSWORD=.*/DB_PASSWORD=dbpassword/" "$env_file"
 
         echo "DB_CONNECTION set to $new_db_connection and DB_HOST set to $new_db_host in $env_file"
+    else
+        echo "$env_file not found."
+    fi
+}
+
+change_mailhog_env(){
+    local env_file="$1"
+
+    if [ -f "$env_file" ]; then
+        # Set default values for Mysql
+        sed -i "s/MAIL_MAILER=.*/MAIL_MAILER=smtp/" "$env_file"
+        sed -i "s/MAIL_HOST=.*/MAIL_HOST=mailhog/" "$env_file"
+        sed -i "s/MAIL_PORT=.*/MAIL_PORT=1025/" "$env_file"
+
+        echo "MAILHOG set in $env_file"
     else
         echo "$env_file not found."
     fi
