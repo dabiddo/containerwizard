@@ -67,7 +67,40 @@ create_laravel_mysql_project() {
     envsubst < "$STUBS_DIR/compose/_laravel_mysql8.stub" > "$DIR/.devcontainer/docker-compose.yml"
     unset DIR
 
-    change_envfile "$project_name/.env" "mysql" "mysql" "$project_name"
+    change_dbcon_envfile "$project_name/.env" "mysql" "mysql" "$project_name"
+    change_mailhog_env "$project_name/.env"
+
+    exit
+}
+
+# Function to create a new Laravel with PostgresSQL project using Docker
+create_laravel_mysql_project() {
+    read -p "Enter project name: " project_name
+    #docker run --rm -v $(pwd):/app composer create-project --prefer-dist laravel/laravel "$project_name" && sh -c "chown -R $(id -u):$(id -g) $project_name"
+    docker run --rm -v "$(pwd)":/app composer create-project --prefer-dist laravel/laravel "$project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+    create_dockercomposefile "$project_name"
+    #create_compose_dev_container "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_laravel.stub" > "$DIR/.devcontainer/Dockerfile"
+    envsubst < "$STUBS_DIR/compose/_laravel_pgl.stub" > "$DIR/.devcontainer/docker-compose.yml"
+    unset DIR
+
+    change_dbcon_envfile "$project_name/.env" "pgsql" "pgsql" "$project_name"
     change_mailhog_env "$project_name/.env"
 
     exit
@@ -301,7 +334,7 @@ laravel_compose_file(){
 }
 
 # Function to change values in .env file
-change_envfile() {
+change_dbcon_envfile() {
     local env_file="$1"
     local new_db_connection="$2"
     local new_db_host="$3"
