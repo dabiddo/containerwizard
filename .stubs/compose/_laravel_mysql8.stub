@@ -21,6 +21,17 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: dbroot
+      MYSQL_DATABASE: $DIR
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpassword
+    ports:
+      - '3306:3306'
+    volumes:
+      - db-data:/var/lib/mysql:cached
 
 # Volumes needed for Caddy certificates and configuration
 volumes:
