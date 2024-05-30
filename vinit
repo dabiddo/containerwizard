@@ -8,7 +8,7 @@ install="install_"
 # Function to display help
 show_help() {
   echo "Usage: $0 --template=<template_name> [--db=<database_type>]"
-  echo "  --template: The project template (e.g., laravel)"
+  echo "  --template: The project template (e.g., laravel, nuxt)"
   echo "  --db: The database type (mysql, pg, or supabase, optional)"
 }
 
@@ -198,6 +198,6 @@ echo "Installer: $install"
 if declare -f "$install" > /dev/null; then
   clear; "$install"
 else
-  echo "Error: Function $install not found."
+  echo "Error: Template for $install not found."
   exit 1
 fi
