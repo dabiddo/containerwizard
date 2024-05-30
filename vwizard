@@ -338,7 +338,7 @@ change_dbcon_envfile() {
     local env_file="$1"
     local new_db_connection="$2"
     local new_db_host="$3"
-    local $projectname = "$4"
+    local projectname="$4"
 
     if [ -f "$env_file" ]; then
         # Set default values for Mysql
