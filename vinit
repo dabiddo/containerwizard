@@ -58,6 +58,20 @@ install_laravel() {
     create_dev_container "$project_name"
     create_dockerfile "$project_name"
     create_dockercomposefile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_laravel.stub" > "$DIR/.devcontainer/Dockerfile"
+    envsubst < "$STUBS_DIR/compose/_laravel.stub" > "$DIR/.devcontainer/docker-compose.yml"
+    unset DIR
     #create_compose_dev_container "$project_name"
     change_mailhog_env "$project_name/.env"
     exit
