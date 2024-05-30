@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Default values for parameters
+template=""
+db=""
+install="install_"
+
+# Function to display help
+show_help() {
+  echo "Usage: $0 --template=<template_name> [--db=<database_type>]"
+  echo "  --template: The project template (e.g., laravel)"
+  echo "  --db: The database type (mysql, pg, or supabase, optional)"
+}
+
+# functin to install laravel with sqlite
+install_laravel() {
+    read -p "Enter project name: " project_name
+    #docker run --rm -v $(pwd):/app composer create-project --prefer-dist laravel/laravel "$project_name" && sh -c "chown -R $(id -u):$(id -g) $project_name"
+    docker run --rm -v "$(pwd)":/app composer create-project --prefer-dist laravel/laravel "$project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+    #create_compose_dev_container "$project_name"
+    #change_mailhog_env "$project_name/.env"
+    exit
+}
+
+# Parse parameters
+while [ "$1" != "" ]; do
+  case $1 in
+    --template=* )
+      template="${1#*=}"
+      ;;
+    --db=* )
+      db="${1#*=}"
+      ;;
+    -h | --help )
+      show_help
+      exit
+      ;;
+    * )
+      echo "Invalid parameter detected: $1"
+      show_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Check if the required parameters are set
+if [ -z "$template" ]; then
+  echo "Error: --template parameter is required."
+  show_help
+  exit 1
+fi
+
+# Check if the db parameter is provided and valid
+if [ -n "$db" ] && [ "$db" != "mysql" ] && [ "$db" != "pg" ] && [ "$db" != "supabase" ]; then
+  echo "Error: --db parameter must be either 'mysql', 'pg', or 'supabase' if provided."
+  show_help
+  exit 1
+fi
+
+install="${install}${template}"
+# Printing the parameters
+echo "Template: $template"
+if [ -n "$db" ]; then
+  echo "Database: $db"
+else
+  echo "Database: Not specified"
+fi
+echo "Installer: $install"
+
+# Dynamically call the function
+if declare -f "$install" > /dev/null; then
+  clear; "$install"
+else
+  echo "Error: Function $install not found."
+  exit 1
+fi
