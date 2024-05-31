@@ -1,0 +1,19 @@
+{
+	"name": "$DIR",
+	"service": "app",
+	"workspaceFolder": "/app",
+	"dockerComposeFile": [
+		"docker-compose.yml"
+	],
+	"forwardPorts": [
+		3000
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"praburangki.nuxt-snippets",
+				"Nuxtr.nuxt-vscode-extentions"
+			]
+		}
+	}
+}

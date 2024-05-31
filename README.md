@@ -27,7 +27,29 @@ Give execute permission to `vwizard`
 sudo chmod +x /usr/local/bin/vwizard
 ```
 
-That should do it, you can call it from anywhere by calling `vwizard
+That should do it, you can call it from anywhere by calling `vwizard`
+
+## use with a know template?
+sure we have the `vinit`
+
+Clone and copy `vinit` to `/usr/local/bin`
+
+```sh
+sudo cp vinit /usr/local/bin/
+```
+
+Give execute permission to `vinit` 
+
+```sh
+sudo chmod +x /usr/local/bin/vinit
+```
+
+### use on directory
+```sh
+vinit --template=<template> --db=[mysql,pg,supabase]
+```
+only template is required
+
 
 ## How to convert existing directory?
 

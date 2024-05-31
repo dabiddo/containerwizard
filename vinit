@@ -1,0 +1,203 @@
+#!/bin/bash
+
+# Default values for parameters
+template=""
+db=""
+install="install_"
+
+# Function to display help
+show_help() {
+  echo "Usage: $0 --template=<template_name> [--db=<database_type>]"
+  echo "  --template: The project template (e.g., laravel, nuxt)"
+  echo "  --db: The database type (mysql, pg, or supabase, optional)"
+}
+
+#create an emtpy devcontainer directory and json file
+create_dev_container(){
+    local project_name=$1
+    # Create the .devcontainer folder inside the project directory
+    devcontainer_dir="$project_name/.devcontainer"
+    mkdir "$devcontainer_dir"
+    echo "Folder '.devcontainer' created inside '$project_name'."
+
+    # Create a default.json file inside the .devcontainer folder
+    touch "$devcontainer_dir/devcontainer.json"
+    echo "devcontainer.json created successfully inside '$devcontainer_dir'."
+}
+
+#create an empty Dockerfile inside the devcontainer directory
+create_dockerfile()
+{
+    local project_name=$1
+    devcontainer_dir="$project_name/.devcontainer"
+
+    # Create a Dockerfile inside the .devcontainer folder
+    touch "$devcontainer_dir/Dockerfile"
+    echo "Dockerfile created successfully inside '$devcontainer_dir'."
+}
+
+#create empty docker-compose file inside devcontainer
+create_dockercomposefile()
+{
+    local project_name=$1
+    devcontainer_dir="$project_name/.devcontainer"
+
+    # Create a Dockerfile inside the .devcontainer folder
+    touch "$devcontainer_dir/docker-compose.yml"
+    echo "docker-compose.yml File created successfully inside '$devcontainer_dir'."
+}
+
+# function to install laravel with sqlite
+install_laravel() {
+    read -p "Enter project name: " project_name
+    #docker run --rm -v $(pwd):/app composer create-project --prefer-dist laravel/laravel "$project_name" && sh -c "chown -R $(id -u):$(id -g) $project_name"
+    docker run --rm -v "$(pwd)":/app composer create-project --prefer-dist laravel/laravel "$project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+    create_dockercomposefile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_laravel.stub" > "$DIR/.devcontainer/Dockerfile"
+    envsubst < "$STUBS_DIR/compose/_laravel.stub" > "$DIR/.devcontainer/docker-compose.yml"
+    unset DIR
+    #create_compose_dev_container "$project_name"
+    change_mailhog_env "$project_name/.env"
+    exit
+}
+
+# Function to create a new Laravel with PostgresSQL project using Docker
+install_laravel_mysql() {
+    read -p "Enter project name: " project_name
+    #docker run --rm -v $(pwd):/app composer create-project --prefer-dist laravel/laravel "$project_name" && sh -c "chown -R $(id -u):$(id -g) $project_name"
+    docker run --rm -v "$(pwd)":/app composer create-project --prefer-dist laravel/laravel "$project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+    create_dockercomposefile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_laravel.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_laravel.stub" > "$DIR/.devcontainer/Dockerfile"
+    envsubst < "$STUBS_DIR/compose/_laravel_mysql8.stub" > "$DIR/.devcontainer/docker-compose.yml"
+    unset DIR
+
+    change_dbcon_envfile "$project_name/.env" "mysql" "mysql" "$project_name"
+    change_mailhog_env "$project_name/.env"
+
+    exit
+}
+
+# Function to change values in .env file
+change_dbcon_envfile() {
+    local env_file="$1"
+    local new_db_connection="$2"
+    local new_db_host="$3"
+    local projectname="$4"
+
+    if [ -f "$env_file" ]; then
+        # Set default values for Mysql
+        sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=$new_db_connection/" "$env_file"
+        sed -i "s/^# *DB_HOST=.*/DB_HOST=$new_db_host/" "$env_file"
+        sed -i "s/^# *DB_PORT=.*/DB_PORT=3306/" "$env_file"
+        sed -i "s/^# *DB_DATABASE=.*/DB_DATABASE=$projectname/" "$env_file"
+        sed -i "s/^# *DB_USERNAME=.*/DB_USERNAME=dbuser/" "$env_file"
+        sed -i "s/^# *DB_PASSWORD=.*/DB_PASSWORD=dbpassword/" "$env_file"
+
+        echo "DB_CONNECTION set to $new_db_connection and DB_HOST set to $new_db_host in $env_file"
+    else
+        echo "$env_file not found."
+    fi
+}
+
+#change mailhog inside the .env file
+change_mailhog_env(){
+    local env_file="$1"
+
+    if [ -f "$env_file" ]; then
+        # Set default values for Mysql
+        sed -i "s/MAIL_MAILER=.*/MAIL_MAILER=smtp/" "$env_file"
+        sed -i "s/MAIL_HOST=.*/MAIL_HOST=mailhog/" "$env_file"
+        sed -i "s/MAIL_PORT=.*/MAIL_PORT=1025/" "$env_file"
+
+        echo "MAILHOG set in $env_file"
+    else
+        echo "$env_file not found."
+    fi
+}
+
+# Parse parameters
+while [ "$1" != "" ]; do
+  case $1 in
+    --template=* )
+      template="${1#*=}"
+      ;;
+    --db=* )
+      db="${1#*=}"
+      ;;
+    -h | --help )
+      show_help
+      exit
+      ;;
+    * )
+      echo "Invalid parameter detected: $1"
+      show_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Check if the required parameters are set
+if [ -z "$template" ]; then
+  echo "Error: --template parameter is required."
+  show_help
+  exit 1
+fi
+
+# Check if the db parameter is provided and valid
+if [ -n "$db" ] && [ "$db" != "mysql" ] && [ "$db" != "pg" ] && [ "$db" != "supabase" ]; then
+  echo "Error: --db parameter must be either 'mysql', 'pg', or 'supabase' if provided."
+  show_help
+  exit 1
+fi
+
+install="${install}${template}"
+# Printing the parameters
+echo "Template: $template"
+if [ -n "$db" ]; then
+   install="${install}_${db}"
+  echo "Database: $db"
+else
+  echo "Database: Not specified"
+fi
+echo "Installer: $install"
+
+# Dynamically call the function
+if declare -f "$install" > /dev/null; then
+  clear; "$install"
+else
+  echo "Error: Template for $install not found."
+  exit 1
+fi

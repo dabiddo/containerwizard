@@ -1,0 +1,11 @@
+FROM node:20.11.0-slim
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install git -y
+
+RUN npm install -g pnpm
+
+ENV HOST 0.0.0.0
+EXPOSE 3000
