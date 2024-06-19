@@ -11,8 +11,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"Nuxtr.nuxt-vscode-extentions",
 				"praburangki.nuxt-snippets",
-				"Nuxtr.nuxt-vscode-extentions"
+				"exer7um.vue-3-vscode-snippets"
 			]
 		}
 	}
