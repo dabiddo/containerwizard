@@ -236,7 +236,35 @@ create_rust_project(){
     exit
 }
 
-create_astrojs_project(){
+create_astrojs_basic_project(){
+    #pnpm create astro@latest testfour --template blog --install --git --yes
+    read -p "Enter project name: " project_name
+    sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g pnpm && pnpm create astro@latest $project_name --template basics --install --git --yes && chown -R $(id -u):$(id -g) $project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+    echo "cleaning temporary files..."
+    sudo rm -rf .pnpm-store 
+
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_astro.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_astro.stub" > "$DIR/.devcontainer/Dockerfile"
+    unset DIR
+
+    exit
+}
+
+create_astrojs_blog_project(){
     #pnpm create astro@latest testfour --template blog --install --git --yes
     read -p "Enter project name: " project_name
     sudo docker run --rm -v "$(pwd):/app" -w /app -it node:20.11.1-alpine sh -c "apk add --no-cache git && npm install -g pnpm && pnpm create astro@latest $project_name --template blog --install --git --yes && chown -R $(id -u):$(id -g) $project_name"
@@ -431,7 +459,7 @@ access_path
 # Main Menu
 # Interactive menu
 PS3="Select an option: "
-options=("Create a new Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs project" "Quit")
+options=("Create a new Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs Basic project" "Create a new AstroJs Blog project" "Quit")
 
 select opt in "${options[@]}"; do
     case $REPLY in
@@ -442,8 +470,9 @@ select opt in "${options[@]}"; do
         5) sleep 1; clear; create_nestjs_project ;;
         6) sleep 1; clear; create_refine_project;;
         7) sleep 1; clear; create_rust_project;;
-        8) sleep 1; clear; create_astrojs_project;;
-        9) echo "Exiting..."; exit ;;
+        8) sleep 1; clear; create_astrojs_basic_project;;
+        9) sleep 1; clear; create_astrojs_blog_project;;
+        10) echo "Exiting..."; exit ;;
         *) echo "Invalid option. Please select again." ;;
     esac
 done
