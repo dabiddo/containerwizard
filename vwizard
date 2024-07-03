@@ -463,6 +463,29 @@ change_dbcon_envfile() {
     fi
 }
 
+# create a marp presentation
+create_marp_presentation() {
+    read -p "Enter project name: " project_name
+    mkdir "$project_name"
+    create_dev_container "$project_name"
+    create_dockerfile "$project_name"
+
+    # Get the directory containing this script
+    SCRIPT_DIR="$(dirname "$0")"
+
+    # Assuming the stubs directory is located alongside the script
+    STUBS_DIR="$SCRIPT_DIR/.stubs"
+
+    DIR=$project_name
+    export DIR
+
+    envsubst < "$STUBS_DIR/devcontainer/_marp.stub" > "$DIR/.devcontainer/devcontainer.json"
+    envsubst < "$STUBS_DIR/dockerfile/_node18.stub" > "$DIR/.devcontainer/Dockerfile"
+    unset DIR
+
+    exit
+}
+
 change_mailhog_env(){
     local env_file="$1"
 
@@ -498,7 +521,7 @@ access_path
 # Main Menu
 # Interactive menu
 PS3="Select an option: "
-options=("Create a new Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new Nuxt.Js with Pocketbase project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs Basic project" "Create a new AstroJs Blog project" "Quit")
+options=("Create a new Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new Nuxt.Js with Pocketbase project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs Basic project" "Create a new AstroJs Blog project" "Create MARP Presentation" "Quit")
 
 select opt in "${options[@]}"; do
     case $REPLY in
@@ -512,7 +535,8 @@ select opt in "${options[@]}"; do
         8) sleep 1; clear; create_rust_project;;
         9) sleep 1; clear; create_astrojs_basic_project;;
         10) sleep 1; clear; create_astrojs_blog_project;;
-        11) echo "Exiting..."; exit ;;
+        11) sleep 1; clear; create_marp_presentation;;
+        12) echo "Exiting..."; exit ;;
         *) echo "Invalid option. Please select again." ;;
     esac
 done
