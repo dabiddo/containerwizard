@@ -15,7 +15,7 @@ services:
       - pocket
   pocket:
     image: ghcr.io/muchobien/pocketbase:latest
-    container_name: pocketbase
+    container_name: $DIR-pocketbase
     restart: unless-stopped
     ports:
       - '8090:8090'
@@ -25,6 +25,5 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-volumes:
 
 
