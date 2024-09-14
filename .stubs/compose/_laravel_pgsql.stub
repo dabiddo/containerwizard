@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: $DIR-app #name of the image
+    environment:
+        SERVER_NAME: ":80"
+    # uncomment the following line if you want to run this in a production environment
+    # restart: always
+    ports:
+      - "80:80" # HTTP
+      #- "443:443" # HTTPS
+      #- "443:443/udp" # HTTP/3
+    volumes:
+      - ../:/app
+      #- caddy_data:/data
+      #- caddy_config:/config
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  pgsql:
+    image: postgres:16.4-alpine
+    environment:
+        POSTGRES_USER: dbuser
+        POSTGRES_PASSWORD: dbpassword
+        POSTGRES_DB: $DIR
+        ports:
+            - '5432:5432'
+    volumes:
+        - db-data:/var/lib/postgresql/data
+    healthcheck:
+        test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+        interval: 1s
+
+# Volumes needed for Caddy certificates and configuration
+volumes:
+  #caddy_data:
+  #caddy_config:
+  db-data:
