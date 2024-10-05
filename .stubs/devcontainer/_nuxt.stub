@@ -7,7 +7,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				
+				"Nuxtr.nuxt-vscode-extentions",
+				"praburangki.nuxt-snippets",
+				"exer7um.vue-3-vscode-snippets"
 			]
 		}
 	}

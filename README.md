@@ -2,9 +2,6 @@
 
 My personal bash file to create .devcontainer projects, based on my daily use of Docker.
 
-## Prerequisites
-Have [Gum](https://github.com/charmbracelet/gum) installed
-
 ## Notes
 This is a personal script, so its only tested on Linux, can't really check if it works on mac...
 
