@@ -73,6 +73,18 @@ create_laravel_mysql_project() {
     exit
 }
 
+# Function to create a new Laravel project using Docker
+create_laravel_project_cli() {
+    read -p "Enter project name: " project_name
+    docker run --rm -it -v "$(pwd)":/app dabiddo/larabox laravel new "$project_name"
+    sudo chown -R "$USER":"$USER" "$project_name"
+    echo "Ownership changed to $USER:$USER for '$project_name'."
+    create_compose_dev_container "$project_name"
+    change_mailhog_env "$project_name/.env"
+    #TODO: show menu to add mysql / pgsql to devcontainer
+    exit
+}
+
 # Function to create a new Laravel with PostgresSQL project using Docker
 create_laravel_pgsql_project() {
     read -p "Enter project name: " project_name
@@ -521,23 +533,24 @@ access_path
 # Main Menu
 # Interactive menu
 PS3="Select an option: "
-options=("Create a new Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Laravel With PGSQL-16 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new Nuxt.Js with Pocketbase project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs Basic project" "Create a new AstroJs Blog project" "Create MARP Presentation" "Quit")
+options=("Create a new Laravel CLI project" "Create a new Composer Laravel project" "Create a new Laravel With MySQL-8 project" "Create a new Laravel With PGSQL-16 project" "Create a new Nuxt.Js project" "Create a new Nuxt.Js with Mysql project" "Create a new Nuxt.Js with Pocketbase project" "Create a new NestJs project" "Create a new Refine.dev project" "Create a new Rust project" "Create a new AstroJs Basic project" "Create a new AstroJs Blog project" "Create MARP Presentation" "Quit")
 
 select opt in "${options[@]}"; do
     case $REPLY in
-        1) sleep 1; clear; create_laravel_project ;;
-        2) sleep 1; clear; create_laravel_mysql_project ;;
-        3) sleep 1; clear; create_laravel_pgsql_project ;;
-        4) sleep 1; clear; create_nuxt_project ;;
-        5) sleep 1; clear; create_nuxt_mysql_project;;
-        6) sleep 1; clear; create_nuxt_pocketbase_project;;
-        7) sleep 1; clear; create_nestjs_project ;;
-        8) sleep 1; clear; create_refine_project;;
-        9) sleep 1; clear; create_rust_project;;
-        10) sleep 1; clear; create_astrojs_basic_project;;
-        11) sleep 1; clear; create_astrojs_blog_project;;
-        12) sleep 1; clear; create_marp_presentation;;
-        13) echo "Exiting..."; exit ;;
+        1) sleep 1; clear; create_laravel_project_cli ;;
+        2) sleep 1; clear; create_laravel_project ;;
+        3) sleep 1; clear; create_laravel_mysql_project ;;
+        4) sleep 1; clear; create_laravel_pgsql_project ;;
+        5) sleep 1; clear; create_nuxt_project ;;
+        6) sleep 1; clear; create_nuxt_mysql_project;;
+        7) sleep 1; clear; create_nuxt_pocketbase_project;;
+        8) sleep 1; clear; create_nestjs_project ;;
+        9) sleep 1; clear; create_refine_project;;
+        10) sleep 1; clear; create_rust_project;;
+        11) sleep 1; clear; create_astrojs_basic_project;;
+        12) sleep 1; clear; create_astrojs_blog_project;;
+        13) sleep 1; clear; create_marp_presentation;;
+        14) echo "Exiting..."; exit ;;
         *) echo "Invalid option. Please select again." ;;
     esac
 done

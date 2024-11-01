@@ -25,7 +25,25 @@
                 "bradlc.vscode-tailwindcss",
                 "ryannaddy.laravel-artisan",
                 "onecentlin.laravel5-snippets",
-                "onecentlin.laravel-extension-pack"
+                "onecentlin.laravel-extension-pack",
+                "cweijan.vscode-database-client2",
+                "cweijan.dbclient-jdbc",
+                "liamhammett.temphpest",
+                "dotenv.dotenv-vscode",
+                "vivaxy.vscode-conventional-commits",
+                "donjayamanne.githistory",
+                "jaguadoromero.vscode-php-create-class",
+                "Just4Devs.php-create-implementation",
+                "st-pham.php-refactor-tool",
+                "PlusTimeIT.php-file-refactoring",
+                "ctf0.php-namespace-resolver",
+                "phiter.phpstorm-snippets",
+                "IvanGrigorov.php-getters-and-setters",
+                "rexshi.phpdoc-comment-vscode-plugin",
+                "ErnstStavroBlofeld.php-types",
+                "mintlify.document",
+                "ctf0.vscode-laravel-gotos",
+                "SandaruwanGunathilake.laravel-eloquent-model-attributes"
             ]
         }
     }
