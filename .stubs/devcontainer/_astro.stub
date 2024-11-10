@@ -1,14 +1,22 @@
 {
     "name":"$DIR",
-    "build": { "dockerfile": "Dockerfile" },
+    "build": {
+		"dockerfile": "Dockerfile"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/sshd:1": {}
+	},
 	"forwardPorts": [
 		4321
 	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				
+				"astro-build.astro-vscode",
+				"ms-azuretools.vscode-docker"
 			]
 		}
-	}
+	},
+	"remoteUser": "node"
 }
